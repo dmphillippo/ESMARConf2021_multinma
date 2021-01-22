@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>multinma: An R package for Bayesian network meta-analysis of individual and aggregate data</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="David Phillippo" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/tile-view/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view/tile-view.js"></script>
+    <link href="libs/tachyons/tachyons.min.css" rel="stylesheet" />
+    <link href="libs/xaringanExtra-extra-styles/xaringanExtra-extra-styles.css" rel="stylesheet" />
+    <meta name="github-repo" content="dmphillippo/ESMARConf2021_multinma"/>
+    <meta name="twitter:title" content="multinma"/>
+    <meta name="twitter:description" content="An R package for Bayesian network meta-analysis of individual and aggregate data. Presented at ESMARConf 2021."/>
+    <meta name="twitter:url" content="https://dmphillippo.github.io/ESMARConf2021_multinma"/>
+    <meta name="twitter:image:src" content="https://dmphillippo.github.io/ESMARConf2021_multinma/share-card.png"/>
+    <meta name="twitter:image:alt" content="Title slide of multinma: An R package for Bayesian network meta-analysis of individual and aggregate data, presented at ESMARConf 2021 by David Phillippo"/>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:creator" content="@dmphillippo"/>
+    <meta name="twitter:site" content="@dmphillippo"/>
+    <meta property="og:title" content="multinma"/>
+    <meta property="og:description" content="An R package for Bayesian network meta-analysis of individual and aggregate data. Presented at ESMARConf 2021."/>
+    <meta property="og:url" content="https://dmphillippo.github.io/ESMARConf2021_multinma"/>
+    <meta property="og:image" content="https://dmphillippo.github.io/ESMARConf2021_multinma/share-card.png"/>
+    <meta property="og:image:alt" content="Title slide of multinma: An R package for Bayesian network meta-analysis of individual and aggregate data, presented at ESMARConf 2021 by David Phillippo"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:locale" content="en_US"/>
+    <meta property="article:author" content="David Phillippo"/>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+class: left, middle
+
+
+
+
+
+
+
+
+
+
+
+
+
+&lt;style type="text/css"&gt;
+/* Hide slide numbers */
+.remark-slide-number {
+  display: none;
+}
+
+/* Add equal 3-column layout */
+.c3left {
+  width: 33.333%;
+  float: left;
+}
+.c3center {
+  width: 33.333%;
+  display: inline-block;
+}
+.c3right {
+  width: 33.333%;
+  float: right;
+}
+
+/* Add 2:1 split columns */
+.c2left {
+  width: 66.666%;
+  float: left;
+}
+.c2right {
+  width: 33.333%;
+  display: inline-block;
+}
+
+/* Highlight last item */
+.highlight-last-item &gt; ul &gt; li, 
+.highlight-last-item &gt; ol &gt; li {
+  opacity: 0.5;
+}
+.highlight-last-item &gt; ul &gt; li:last-of-type,
+.highlight-last-item &gt; ol &gt; li:last-of-type {
+  opacity: 1;
+}
+
+/* Fix double-star bold */
+strong {
+  font-weight: bold;
+  color: var(--text-bold-color);
+}
+
+/* Horizontal line before footnotes */
+.footnote:first-of-type {
+  border-top: 0.5px solid var(--text-color);
+  margin-right: 4em;
+  padding-right: 0px;
+  padding-top: 0.5em;
+}
+
+/* Accent colour */
+.accent {
+  color: var(--text-bold-color);
+}
+
+/* Turn off slide shadow */
+.remark-slide-scaler { 
+  box-shadow: none;
+} 
+
+/* Add small header option */
+.hsmall {
+  font-family: var(--header-font-family);
+  font-weight: 600;
+  color: var(--header-color);
+  font-size: 1.5rem;
+  position: absolute;
+  top: 0.75rem;
+}
+&lt;/style&gt;
+
+
+
+&lt;img src="logo.svg" style="width: 15%;position: absolute;top: 0px;right: 0px;margin: 5% 5% 0% 0%"/&gt;
+
+# multinma
+### An R package for Bayesian network meta-analysis of individual and aggregate data
+
+&lt;br&gt;&lt;br&gt;
+
+#### David Phillippo
+
+&lt;svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="height:1em;fill:currentColor;position:relative;display:inline-block;top:.1em;"&gt;  [ comment ]  &lt;path d="M496 128v16a8 8 0 0 1-8 8h-24v12c0 6.627-5.373 12-12 12H60c-6.627 0-12-5.373-12-12v-12H24a8 8 0 0 1-8-8v-16a8 8 0 0 1 4.941-7.392l232-88a7.996 7.996 0 0 1 6.118 0l232 88A8 8 0 0 1 496 128zm-24 304H40c-13.255 0-24 10.745-24 24v16a8 8 0 0 0 8 8h464a8 8 0 0 0 8-8v-16c0-13.255-10.745-24-24-24zM96 192v192H60c-6.627 0-12 5.373-12 12v20h416v-20c0-6.627-5.373-12-12-12h-36V192h-64v192h-64V192h-64v192h-64V192H96z"&gt;&lt;/path&gt;&lt;/svg&gt; University of Bristol, UK
+
+&lt;svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="height:1em;fill:currentColor;position:relative;display:inline-block;top:.1em;"&gt;  [ comment ]  &lt;path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"&gt;&lt;/path&gt;&lt;/svg&gt; dmphillippo
+
+---
+
+## NMA and population adjustment
+
+.c2left[
+Standard (network) meta-analysis and indirect comparison methods
+* Synthesise published aggregate data (AgD)
+* Assume **constancy of relative effects**
+`$$d_{AB(AB)} = d_{AB(AC)}$$`
+]
+.c2right[.center[
+![](multinma_pres_files/figure-html/ic-network-1.svg)&lt;!-- --&gt;
+]]
+
+&lt;svg viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg" style="height:1em;fill:currentColor;position:relative;display:inline-block;top:.1em;"&gt;  [ comment ]  &lt;path d="M190.5 66.9l22.2-22.2c9.4-9.4 24.6-9.4 33.9 0L441 239c9.4 9.4 9.4 24.6 0 33.9L246.6 467.3c-9.4 9.4-24.6 9.4-33.9 0l-22.2-22.2c-9.5-9.5-9.3-25 .4-34.3L311.4 296H24c-13.3 0-24-10.7-24-24v-32c0-13.3 10.7-24 24-24h287.4L190.9 101.2c-9.8-9.3-10-24.8-.4-34.3z"&gt;&lt;/path&gt;&lt;/svg&gt; Biased if there are differences in **effect modifiers** between studies
+
+--
+
+&lt;br&gt;
+**Population adjustment** methods aim to relax this assumption using available individual patient data (IPD) to adjust for differences in effect modifiers between studies 
+
+* Ideally, we would have IPD from every study (IPD network meta-regression)
+* More typically we only have IPD from a subset
+
+---
+
+## Multilevel network meta-regression&lt;br&gt;(ML-NMR)
+
+.footnote[Phillippo et al. (2020) Multilevel Network Meta-Regression for population-adjusted treatment comparisons. *J R Stat Soc: A*, 183(3):1189-1210. [DOI: 10.1111/rssa.12579](https://doi.org/10.1111/rssa.12579)]
+
+Extends the NMA framework to synthesise mixtures of IPD and AgD and perform population adjustment in networks of any size
+
+--
+
+.c2left[
+1\. Define an individual-level regression model 
+
+  * IPD network meta-regression
+]
+.c2right.nt3[.center[
+&lt;img src="multinma_pres_files/figure-html/unnamed-chunk-2-1.svg" width="125" /&gt;
+]]
+
+--
+
+.flex[
+.c2left.nt3[
+2\. Average (integrate) this over the aggregate study populations to form the aggregate-level model
+
+  * Use efficient and general numerical integration
+]
+.c2right.nt3[![](figs/qmc_scatter_joint.png)]
+]
+
+---
+class: middle, inverse
+
+# The {multinma} package
+
+---
+
+## The multinma package
+
+.bg-washed-green.b--dark-green.ba.bw1.br3.ph3[
+A suite of tools for performing ML-NMR and NMA with IPD, AgD, or mixtures of both, for a range of outcome types
+]
+
+--
+
+&lt;br&gt;
+The package includes functions that
+  * Streamline the setup of NMA and ML-NMR models
+  * Perform model fitting and facilitate diagnostics
+  * Produce posterior summaries of relative effects, rankings, and absolute predictions
+  * Create flexible graphical outputs that leverage `ggplot` and `ggdist`
+
+--
+
+&lt;br&gt;
+Models are estimated in a Bayesian framework using *Stan*
+  * Precompiled on CRAN (no user C++ toolchain / Rtools required)
+
+---
+
+## Outline of NMA in multinma
+
+1\. Data in long ("tidy") format
+  * One row per arm/contrast per AgD study, or per individual in IPD
+
+--
+
+2\. Define the network
+  * `set_agd_arm()` &amp;emsp; `set_agd_contrast()` &amp;emsp; `set_ipd()`
+  * `combine_network()`
+
+--
+
+3\. Specify prior distributions, run analysis
+  * `nma()`
+  * Fixed and random effects, UME inconsistency models, regression, ...
+
+--
+
+4\. Check convergence, model fit, results
+  * `print()` &amp;emsp; `plot()` &amp;emsp; `plot_prior_posterior()` &amp;emsp; `dic()`
+  * `relative_effects()` &amp;emsp; `predict()` &amp;emsp; `posterior_ranks()`
+
+---
+
+## Outline of ML-NMR in multinma
+.o-50[
+1\. Data in long ("tidy") format
+  * One row per arm/contrast per AgD study, or per individual in IPD
+
+2\. Define the network
+  * `set_agd_arm()` &amp;emsp; `set_agd_contrast()` &amp;emsp; `set_ipd()`
+  * `combine_network()`
+  ]
+
+.bg-washed-green.b--dark-green.ba.bw1.br3.nl3.ph3[
+3\. Set up numerical integration
+  * `add_integration()` &amp;emsp; `distr()`
+]
+
+.o-50[
+4\. Specify prior distributions, run analysis
+  * `nma()`
+  * Fixed and random effects, UME inconsistency models, regression, ...
+
+5\. Check convergence, model fit, results
+  * `print()` &amp;emsp; `plot()` &amp;emsp; `plot_prior_posterior()` &amp;emsp; `dic()`
+  * `relative_effects()` &amp;emsp; `predict()` &amp;emsp; `posterior_ranks()`
+]
+
+---
+class: middle, inverse
+
+# Example
+## Plaque Psoriasis ML-NMR
+
+---
+
+.hsmall[Tidy data]&lt;p style="margin: 0pt;height: 0.5rem;"&gt;&lt;/p&gt;
+
+
+
+
+```r
+pso_agd
+```
+&lt;PRE class="fansi fansi-output"&gt;&lt;CODE&gt;## &lt;span style='color: #555555;'&gt;# A tibble: 4 x 13&lt;/span&gt;&lt;span&gt;
+##   studyc trtc  trtclass pasi75_r pasi75_n durnpso_mean durnpso_sd
+##   &lt;/span&gt;&lt;span style='color: #555555;font-style: italic;'&gt;&amp;lt;chr&amp;gt;&lt;/span&gt;&lt;span&gt;  &lt;/span&gt;&lt;span style='color: #555555;font-style: italic;'&gt;&amp;lt;chr&amp;gt;&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span style='color: #555555;font-style: italic;'&gt;&amp;lt;chr&amp;gt;&lt;/span&gt;&lt;span&gt;       &lt;/span&gt;&lt;span style='color: #555555;font-style: italic;'&gt;&amp;lt;dbl&amp;gt;&lt;/span&gt;&lt;span&gt;    &lt;/span&gt;&lt;span style='color: #555555;font-style: italic;'&gt;&amp;lt;dbl&amp;gt;&lt;/span&gt;&lt;span&gt;        &lt;/span&gt;&lt;span style='color: #555555;font-style: italic;'&gt;&amp;lt;dbl&amp;gt;&lt;/span&gt;&lt;span&gt;      &lt;/span&gt;&lt;span style='color: #555555;font-style: italic;'&gt;&amp;lt;dbl&amp;gt;&lt;/span&gt;&lt;span&gt;
+## &lt;/span&gt;&lt;span style='color: #555555;'&gt;1&lt;/span&gt;&lt;span&gt; FIXTU~ ETN   TNFa bl~      142      323         1.64       1.2 
+## &lt;/span&gt;&lt;span style='color: #555555;'&gt;2&lt;/span&gt;&lt;span&gt; FIXTU~ PBO   Placebo        16      324         1.66       1.16
+## &lt;/span&gt;&lt;span style='color: #555555;'&gt;3&lt;/span&gt;&lt;span&gt; FIXTU~ SEC_~ IL bloc~      219      327         1.73       1.22
+## &lt;/span&gt;&lt;span style='color: #555555;'&gt;4&lt;/span&gt;&lt;span&gt; FIXTU~ SEC_~ IL bloc~      249      323         1.58       1.23
+## &lt;/span&gt;&lt;span style='color: #555555;'&gt;# ... with 6 more variables: weight_mean &lt;/span&gt;&lt;span style='color: #555555;font-style: italic;'&gt;&amp;lt;dbl&amp;gt;&lt;/span&gt;&lt;span style='color: #555555;'&gt;, weight_sd &lt;/span&gt;&lt;span style='color: #555555;font-style: italic;'&gt;&amp;lt;dbl&amp;gt;&lt;/span&gt;&lt;span style='color: #555555;'&gt;,&lt;/span&gt;&lt;span&gt;
+## &lt;/span&gt;&lt;span style='color: #555555;'&gt;#   bsa_mean &lt;/span&gt;&lt;span style='color: #555555;font-style: italic;'&gt;&amp;lt;dbl&amp;gt;&lt;/span&gt;&lt;span style='color: #555555;'&gt;, bsa_sd &lt;/span&gt;&lt;span style='color: #555555;font-style: italic;'&gt;&amp;lt;dbl&amp;gt;&lt;/span&gt;&lt;span style='color: #555555;'&gt;, prevsys &lt;/span&gt;&lt;span style='color: #555555;font-style: italic;'&gt;&amp;lt;dbl&amp;gt;&lt;/span&gt;&lt;span style='color: #555555;'&gt;, psa &lt;/span&gt;&lt;span style='color: #555555;font-style: italic;'&gt;&amp;lt;dbl&amp;gt;&lt;/span&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/CODE&gt;&lt;/PRE&gt;
+
+--
+
+
+```r
+pso_ipd
+```
+&lt;PRE class="fansi fansi-output"&gt;&lt;CODE&gt;## &lt;span style='color: #555555;'&gt;# A tibble: 3,854 x 9&lt;/span&gt;&lt;span&gt;
+##    studyc trtc  trtclass pasi75 durnpso weight   bsa prevsys
+##    &lt;/span&gt;&lt;span style='color: #555555;font-style: italic;'&gt;&amp;lt;chr&amp;gt;&lt;/span&gt;&lt;span&gt;  &lt;/span&gt;&lt;span style='color: #555555;font-style: italic;'&gt;&amp;lt;chr&amp;gt;&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span style='color: #555555;font-style: italic;'&gt;&amp;lt;chr&amp;gt;&lt;/span&gt;&lt;span&gt;     &lt;/span&gt;&lt;span style='color: #555555;font-style: italic;'&gt;&amp;lt;dbl&amp;gt;&lt;/span&gt;&lt;span&gt;   &lt;/span&gt;&lt;span style='color: #555555;font-style: italic;'&gt;&amp;lt;dbl&amp;gt;&lt;/span&gt;&lt;span&gt;  &lt;/span&gt;&lt;span style='color: #555555;font-style: italic;'&gt;&amp;lt;dbl&amp;gt;&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span style='color: #555555;font-style: italic;'&gt;&amp;lt;dbl&amp;gt;&lt;/span&gt;&lt;span&gt;   &lt;/span&gt;&lt;span style='color: #555555;font-style: italic;'&gt;&amp;lt;dbl&amp;gt;&lt;/span&gt;&lt;span&gt;
+## &lt;/span&gt;&lt;span style='color: #555555;'&gt; 1&lt;/span&gt;&lt;span&gt; UNCOV~ IXE_~ IL bloc~      0    0.67   9.81 0.18        1
+## &lt;/span&gt;&lt;span style='color: #555555;'&gt; 2&lt;/span&gt;&lt;span&gt; UNCOV~ IXE_~ IL bloc~      1    1.45  13.0  0.33        0
+## &lt;/span&gt;&lt;span style='color: #555555;'&gt; 3&lt;/span&gt;&lt;span&gt; UNCOV~ IXE_~ IL bloc~      1    2.65   7.8  0.33        1
+## &lt;/span&gt;&lt;span style='color: #555555;'&gt; 4&lt;/span&gt;&lt;span&gt; UNCOV~ IXE_~ IL bloc~      0    2.5   14.0  0.5         1
+## &lt;/span&gt;&lt;span style='color: #555555;'&gt; 5&lt;/span&gt;&lt;span&gt; UNCOV~ IXE_~ IL bloc~      1    1.19   5.42 0.35        1
+## &lt;/span&gt;&lt;span style='color: #555555;'&gt; 6&lt;/span&gt;&lt;span&gt; UNCOV~ IXE_~ IL bloc~      1    1.52   6.75 0.290       1
+## &lt;/span&gt;&lt;span style='color: #555555;'&gt; 7&lt;/span&gt;&lt;span&gt; UNCOV~ IXE_~ IL bloc~      1    2.41   8.59 0.19        1
+## &lt;/span&gt;&lt;span style='color: #555555;'&gt; 8&lt;/span&gt;&lt;span&gt; UNCOV~ IXE_~ IL bloc~      1    1.3   11.5  0.290       1
+## &lt;/span&gt;&lt;span style='color: #555555;'&gt; 9&lt;/span&gt;&lt;span&gt; UNCOV~ IXE_~ IL bloc~      1    1.97   6.76 0.18        1
+## &lt;/span&gt;&lt;span style='color: #555555;'&gt;10&lt;/span&gt;&lt;span&gt; UNCOV~ IXE_~ IL bloc~      1    0.71   9.78 0.25        1
+## &lt;/span&gt;&lt;span style='color: #555555;'&gt;# ... with 3,844 more rows, and 1 more variable: psa &lt;/span&gt;&lt;span style='color: #555555;font-style: italic;'&gt;&amp;lt;dbl&amp;gt;&lt;/span&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/CODE&gt;&lt;/PRE&gt;
+
+---
+
+.hsmall[Network setup]&lt;p style="margin: 0pt;height: 0.5rem;"&gt;&lt;/p&gt;
+
+
+```r
+pso_net &lt;- combine_network(
+  set_ipd(pso_ipd, study = studyc, trt = trtc, 
+          r = pasi75,
+          trt_class = trtclass),
+  set_agd_arm(pso_agd, study = studyc, trt = trtc, 
+              r = pasi75_r, n = pasi75_n,
+              trt_class = trtclass)
+)
+pso_net
+```
+
+&lt;PRE class="fansi fansi-output"&gt;&lt;CODE&gt;## A network with 3 IPD studies, and 1 AgD study (arm-based).
+## 
+## &lt;span style='color: #555555;'&gt;----------------------------------------------------&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span style='font-weight: bold;'&gt;IPD studies&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span style='color: #555555;'&gt;----&lt;/span&gt;&lt;span&gt; 
+##  Study     Treatments                      
+##  UNCOVER-1 3: IXE_Q2W | IXE_Q4W | PBO      
+##  UNCOVER-2 4: ETN | IXE_Q2W | IXE_Q4W | PBO
+##  UNCOVER-3 4: ETN | IXE_Q2W | IXE_Q4W | PBO
+## 
+##  Outcome type: binary
+## &lt;/span&gt;&lt;span style='color: #555555;'&gt;----------------------------------------&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span style='font-weight: bold;'&gt;AgD studies (arm-based)&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span style='color: #555555;'&gt;----&lt;/span&gt;&lt;span&gt; 
+##  Study   Treatments                      
+##  FIXTURE 4: ETN | PBO | SEC_150 | SEC_300
+## 
+##  Outcome type: count
+## &lt;/span&gt;&lt;span style='color: #555555;'&gt;---------------------------------------------------------------------&lt;/span&gt;&lt;span&gt;
+## Total number of treatments: 6, in 3 classes
+## Total number of studies: 4
+## Reference treatment is: PBO
+## Network is &lt;/span&gt;&lt;span style='color: #00BB00;'&gt;connected&lt;/span&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/CODE&gt;&lt;/PRE&gt;
+
+---
+
+.hsmall[Network plot]&lt;p style="margin: 0pt;height: 0.5rem;"&gt;&lt;/p&gt;
+
+
+```r
+plot(pso_net, 
+     weight_nodes = TRUE, 
+     weight_edges = TRUE, 
+     show_trt_class = TRUE)
+```
+
+&lt;img src="multinma_pres_files/figure-html/pso_network_plot-1.png" width="3000" /&gt;
+
+---
+
+.hsmall[Adding numerical integration]&lt;p style="margin: 0pt;height: 0.5rem;"&gt;&lt;/p&gt;
+
+
+```r
+pso_net &lt;- add_integration(pso_net,
+  durnpso = distr(qgamma, mean = durnpso_mean, sd = durnpso_sd),
+  prevsys = distr(qbern, prob = prevsys),
+  bsa     = distr(qlogitnorm, mean = bsa_mean, sd = bsa_sd),
+  weight  = distr(qgamma, mean = weight_mean, sd = weight_sd),
+  psa     = distr(qbern, prob = psa),
+  n_int = 1000
+)
+```
+
+```
+## Using weighted average correlation matrix computed from IPD studies.
+```
+
+---
+
+.hsmall[Model fitting]&lt;p style="margin: 0pt;height: 0.5rem;"&gt;&lt;/p&gt;
+
+
+```r
+pso_fit_FE &lt;- 
+  nma(pso_net, 
+      # FE model
+      trt_effects = "fixed",
+      # Probit link
+      link = "probit", 
+      # Regression
+      regression = ~(durnpso + prevsys + bsa + weight + psa)*.trt,
+      #Priors
+      prior_intercept = normal(scale = 10),
+      prior_trt = normal(scale = 10),
+      prior_reg = normal(scale = 10))
+```
+
+```
+## Note: Setting "PBO" as the network reference treatment.
+```
+
+---
+
+.hsmall[Results]&lt;p style="margin: 0pt;height: 0.5rem;"&gt;&lt;/p&gt;
+
+
+```r
+print(pso_fit_FE)
+```
+```
+## A fixed effects ML-NMR with a bernoulli2 likelihood (probit link).
+## Regression model: ~(durnpso + prevsys + bsa + weight + psa) * .trt.
+##
+## Centred covariates at the following overall mean values:
+##   durnpso   prevsys       bsa    weight       psa 
+## 1.8259772 0.6495432 0.2917678 8.9328063 0.2172823 
+##
+## Inference for Stan model: binomial_2par.
+## 4 chains, each with iter=2000; warmup=1000; thin=1; 
+## post-warmup draws per chain=1000, total post-warmup draws=4000.
+## 
+##                mean se_mean   sd  2.5%   25%   50%  75% 97.5% n_eff Rhat
+## beta[bsa]     -0.06    0.01 0.44 -0.98 -0.35 -0.05 0.25  0.77  4622    1
+##   ...
+## beta[bsa:aTNF] 0.05    0.01 0.53 -0.94 -0.32  0.03 0.39  1.09  5010    1
+## beta[bsa:aIL]  0.28    0.01 0.49 -0.65 -0.04  0.27 0.61  1.29  5656    1
+##   ...
+## d[ETN]         1.55    0.00 0.08  1.40  1.50  1.55 1.61  1.71  4276    1
+## d[IXE_Q2W]     2.96    0.00 0.09  2.80  2.90  2.95 3.02  3.13  4427    1
+## d[IXE_Q4W]     2.54    0.00 0.08  2.39  2.49  2.54 2.60  2.71  4757    1
+## d[SEC_150]     2.15    0.00 0.11  1.93  2.07  2.14 2.22  2.37  5465    1
+## d[SEC_300]     2.45    0.00 0.12  2.22  2.37  2.45 2.53  2.69  7170    1
+## 
+```
+
+---
+
+.hsmall[Plots of model parameters]&lt;p style="margin: 0pt;height: 0.5rem;"&gt;&lt;/p&gt;
+
+
+```r
+plot(pso_fit_FE,
+     pars = c("d", "beta"),
+     stat = "halfeye",
+     ref_line = 0)
+```
+
+&lt;img src="multinma_pres_files/figure-html/unnamed-chunk-12-1.png" width="2400" /&gt;
+
+---
+
+.hsmall[Population-average relative effects]&lt;p style="margin: 0pt;height: 0.5rem;"&gt;&lt;/p&gt;
+
+
+
+
+```r
+(pso_releff_FE &lt;- relative_effects(pso_fit_FE, 
+                                   newdata = new_agd_means))
+```
+```
+## --------------------------------------------------- Study: New 1 ---- 
+## Covariate values:
+##  durnpso prevsys bsa weight psa
+##        3     0.1 0.6     10 0.2
+## 
+##                   mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS
+## d[New 1: ETN]     1.25 0.23 0.81 1.10 1.25 1.40  1.72     6040
+## d[New 1: IXE_Q2W] 2.89 0.22 2.46 2.74 2.89 3.03  3.34     6894
+## d[New 1: IXE_Q4W] 2.47 0.22 2.04 2.33 2.47 2.62  2.92     7020
+## d[New 1: SEC_150] 2.08 0.22 1.65 1.93 2.07 2.22  2.52     7082
+## d[New 1: SEC_300] 2.39 0.22 1.94 2.24 2.38 2.53  2.84     7335
+```
+
+
+```r
+plot(pso_releff_FE, ref_line = 0)
+```
+
+&lt;img src="multinma_pres_files/figure-html/pso_releff_FE_new-1.png" width="2400" /&gt;
+
+---
+
+.hsmall[Population-average predicted probabilities]&lt;p style="margin: 0pt;height: 0.5rem;"&gt;&lt;/p&gt;
+
+
+```r
+(pso_pred_FE &lt;- predict(pso_fit_FE, 
+                        type = "response",
+                        newdata = new_agd_int,
+                        baseline = distr(qnorm, -1.75, 0.08)))
+```
+```
+## --------------------------------------------------- Study: New 1 ---- 
+## 
+##                      mean   sd 2.5%  25%  50%  75% 97.5% Bulk_ESS
+## pred[New 1: PBO]     0.06 0.02 0.03 0.04 0.06 0.08  0.12     5244
+## pred[New 1: ETN]     0.37 0.06 0.26 0.33 0.37 0.40  0.49     6711
+## pred[New 1: IXE_Q2W] 0.90 0.03 0.84 0.88 0.90 0.92  0.94     5593
+## pred[New 1: IXE_Q4W] 0.80 0.04 0.73 0.78 0.81 0.83  0.87     5957
+## pred[New 1: SEC_150] 0.68 0.05 0.57 0.64 0.68 0.72  0.79     5905
+## pred[New 1: SEC_300] 0.78 0.05 0.68 0.75 0.78 0.81  0.86     5968
+```
+
+
+```r
+plot(pso_pred_FE, ref_line = c(0, 1))
+```
+
+&lt;img src="multinma_pres_files/figure-html/pso_pred_FE_new-1.png" width="2400" /&gt;
+
+---
+
+.hsmall[And more...]&lt;p style="margin: 0pt;height: 0.5rem;"&gt;&lt;/p&gt;
+
+
+```r
+pso_cumrankprobs_FE &lt;- 
+  posterior_rank_probs(pso_fit_FE, newdata = new_agd_means,
+                       lower_better = FALSE, cumulative = TRUE)
+plot(pso_cumrankprobs_FE)
+```
+
+&lt;img src="multinma_pres_files/figure-html/pso_cumrankprobs_FE-1.png" width="2400" /&gt;
+
+---
+
+.hsmall[And more...]&lt;p style="margin: 0pt;height: 0.5rem;"&gt;&lt;/p&gt;
+
+
+```r
+dic(pso_fit_FE)
+```
+
+&lt;PRE class="fansi fansi-output"&gt;&lt;CODE&gt;## Residual deviance: 3129.7&lt;span style='color: #555555;'&gt; (on 3858 data points)&lt;/span&gt;&lt;span&gt;
+##                pD: 24.3
+##               DIC: 3153.9
+&lt;/span&gt;&lt;/CODE&gt;&lt;/PRE&gt;
+
+
+
+
+
+
+```r
+# Smoking cessation example
+plot(dic_re)
+plot(dic_re, dic_ume, 
+     interval_alpha = 0.05)
+```
+
+&lt;img src="multinma_pres_files/figure-html/smk_devdev-1.png" width="50%" /&gt;&lt;img src="multinma_pres_files/figure-html/smk_devdev-2.png" width="50%" /&gt;
+
+---
+class: middle, inverse
+
+# Further details
+
+---
+
+exclude: true
+
+## Future plans
+
+The multinma package is under active development. Plans for future releases include:
+.pull-left.nt3[
+* Survival/time-to-event outcomes
+* Competing risks
+* Node splitting
+* Handling disconnected networks/single-arm studies
+* Exchangeable interactions
+]
+.pull-right.nt3[
+* Class effects models
+* Unequal heterogeneity variances between contrasts
+* Regression on baseline risk
+* Predictive distributions
+]
+
+Interface with other packages:
+.flex[
+.pull-left.nt3[
+* bayesplot, shinystan .dark-green[✔]
+* rstan, loo .dark-green[✔]
+* tidybayes, ggdist .dark-green[✔]
+]
+.pull-right.nt3[
+* posterior, coda, tidymeta
+* gemtc
+* nmathresh
+]
+]
+---
+
+## Further details
+
+Package website: **[dmphillippo.github.io/multinma](https://dmphillippo.github.io/multinma)**
+&lt;img src="logo.svg" style="width: 12.5%;position: absolute;top: 5%;right: 5%;"/&gt;
+* Illustrated documentation
+* Detailed walkthroughs of example analyses (vignettes)
+
+Paper:
+.ml3[
+Phillippo et al. (2020) Multilevel Network Meta-Regression for population-adjusted treatment comparisons. *J R Stat Soc: A*, 183(3):1189-1210. [DOI: 10.1111/rssa.12579](https://doi.org/10.1111/rssa.12579)
+]
+
+Contribute:
+.ml3[
+&lt;svg viewBox="0 0 496 512" xmlns="http://www.w3.org/2000/svg" style="height:1em;fill:currentColor;position:relative;display:inline-block;top:.1em;"&gt;  [ comment ]  &lt;path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"&gt;&lt;/path&gt;&lt;/svg&gt; [dmphillippo/multinma](https://github.com/dmphillippo/multinma)
+]
+
+.center.mt10[
+### Thank you
+
+**&lt;svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="height:1em;fill:currentColor;position:relative;display:inline-block;top:.1em;"&gt;  [ comment ]  &lt;path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"&gt;&lt;/path&gt;&lt;/svg&gt; dmphillippo**
+]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"navigation": {
+"click": true
+}
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

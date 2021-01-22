@@ -21,4 +21,4 @@ The package includes functions that streamline the setup of NMA and ML-NMR model
 Models are estimated in a Bayesian framework using the state-of-the art Stan sampler.
 
 ### Recording
-A recording is available on [YouTube](https://t.co/vdMPQSEROj?amp=1).
+A recording is available on [YouTube](https://www.youtube.com/watch?t=652&v=d4ufa__hGbY).
